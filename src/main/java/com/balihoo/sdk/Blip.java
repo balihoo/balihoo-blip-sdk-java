@@ -1,4 +1,4 @@
-package main.java.com.balihoo.sdk;
+package com.balihoo.sdk;
 
 /**
  * The BLIP object and its methods.

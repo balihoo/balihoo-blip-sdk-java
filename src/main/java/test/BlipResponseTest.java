@@ -1,8 +1,8 @@
 package test;
 
+import com.balihoo.sdk.BlipResponse;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import main.java.com.balihoo.sdk.BlipResponse;
 
 public class BlipResponseTest {
 

@@ -1,4 +1,4 @@
-package main.java.com.balihoo.sdk;
+package com.balihoo.sdk;
 
 /**
  * The response returned when a BLIP API call is made.
