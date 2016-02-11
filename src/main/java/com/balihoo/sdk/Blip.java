@@ -15,7 +15,7 @@ public class Blip {
      */
     public Blip(String apiKey, String secretKey) {
         this.Credentials = encodeCredentials(apiKey, secretKey);
-        this.Endpoint = "https://blip.dev.balihoo-cloud.com";
+        this.Endpoint = "https://blip.balihoo-cloud.com";
     }
 
     /**
