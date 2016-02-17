@@ -2,6 +2,7 @@ package test;
 
 import com.balihoo.sdk.BlipResponse;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 public class BlipResponseTest {
@@ -12,7 +13,7 @@ public class BlipResponseTest {
         String message = "Successful Test";
         BlipResponse blipResponse = new BlipResponse(statusCode, message);
 
-        assertEquals(blipResponse.StatusCode, statusCode);
-        assertEquals(blipResponse.Body, message);
+        assertEquals(blipResponse.STATUS_CODE, statusCode);
+        assertEquals(blipResponse.BODY, message);
     }
 }

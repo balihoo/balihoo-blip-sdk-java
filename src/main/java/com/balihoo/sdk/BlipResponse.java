@@ -5,8 +5,8 @@ package com.balihoo.sdk;
  */
 public class BlipResponse {
 
-    public int StatusCode;
-    public String Body;
+    public final int STATUS_CODE;
+    public final String BODY;
 
     /**
      * The BlipResponse constructor.
@@ -14,7 +14,7 @@ public class BlipResponse {
      * @param body The body text that is returned in the HTTP response.
      */
     public BlipResponse(int statusCode, String body) {
-        this.StatusCode = statusCode;
-        this.Body = body;
+        STATUS_CODE = statusCode;
+        BODY = body;
     }
 }

@@ -1,5 +1,5 @@
 # BLIP Java SDK
-A Java SDK for interacting with the Balihoo location information platform (BLIP).
+A Java SDK for interacting with the Balihoo Local Information Platform (BLIP).
 
 ## Requirements
 - Using this SDK requires that you already have API keys and are interacting on behalf of a brand that already exists in Balihoo's system. Please contact Balihoo if you require API keys and/or would like to add a new brand to our system.
@@ -13,17 +13,17 @@ A Java SDK for interacting with the Balihoo location information platform (BLIP)
     BlipResponse brandResponse = blip.getBrandKeys();
 
     // Status Code (e.g. 200, 204, 404, etc.)
-    int responseCode = brandResponse.StatusCode;
+    int responseCode = brandResponse.STATUS_CODE;
 
     // Response Content
-    String myBrands = brandResponse.Body;
+    String myBrands = brandResponse.BODY;
 ```
 
 ## Methods
 All methods return a **BlipResponse** object with two properties:
-- **StatusCode**
+- **STATUS_CODE**
   - The HTTP response code (e.g. 200, 204, 404) as an integer.
-- **Body**
+- **BODY**
   - The HTTP response content as a string.
   - For calls that return brand or location data this property will contain stringified JSON objects.
 
@@ -35,7 +35,7 @@ Ping the BLIP API.
     Blip blip = new Blip("<Your API Key>", "<Your Secret Key>");
     BlipResponse blipResponse = blip.Ping();
 
-    if (blipResponse.StatusCode == 200)
+    if (blipResponse.STATUS_CODE == 200)
     {
       // Success!
     }
@@ -49,7 +49,7 @@ Get a list of brandKeys that the API user is authorized to access.
     Blip blip = new Blip("<Your API Key>", "<Your Secret Key>");
     BlipResponse blipResponse = blip.GetBrandKeys();
 
-    String myBrandKeys = blipResponse.Body;
+    String myBrandKeys = blipResponse.BODY;
 ```
 ---
 ### **GetBrandSources**
@@ -63,7 +63,7 @@ Get a list of data sources available for an individual brand.
     Blip blip = new Blip("<Your API Key>", "<Your Secret Key>");
     BlipResponse blipResponse = blip.GetBrandSources("mybrand");
 
-    String sources = blipResponse.Body;
+    String sources = blipResponse.BODY;
 ```
 ---
 ### **GetBrandProjections**
@@ -77,7 +77,7 @@ Get a list of data projections available for an individual brand.
     Blip blip = new Blip("<Your API Key>", "<Your Secret Key>");
     BlipResponse blipResponse = blip.GetBrandProjections("mybrand");
 
-    String projections = blipResponse.Body;
+    String projections = blipResponse.BODY;
 ```
 ---
 ### **GetLocationKeys**
@@ -92,7 +92,7 @@ Get a list of locationKeys for all locations belonging to the specified brand.
     Blip blip = new Blip("<Your API Key>", "<Your Secret Key>");
     BlipResponse blipResponse = blip.GetLocationKeys("mybrand");
 
-    String locationKeys = blipResponse.Body;
+    String locationKeys = blipResponse.BODY;
 ```
 ---
 ### **GetLocation**
@@ -109,7 +109,7 @@ Get data for an individual location within the specified brand.
     Blip blip = new Blip("<Your API Key>", "<Your Secret Key>");
     BlipResponse blipResponse = blip.GetLocation("mybrand", "mylocation");
 
-    String locationData = blipResponse.Body;
+    String locationData = blipResponse.BODY;
 ```
 ---
 ### **QueryLocations**
@@ -126,7 +126,7 @@ Get data for locations in a single brand filtered by the specified BLIP query.
     String query = "{\"address.state\":{\"equals\":\"ID\"}}";
     BlipResponse blipResponse = blip.QueryLocations("mybrand", query);
 
-    String matchingLocations = blipResponse.Body;
+    String matchingLocations = blipResponse.BODY;
 ```
 ---
 ### **PutLocation**
@@ -144,7 +144,7 @@ Add a new location or update an existing location's data.
     String locationDocument = "{\"document\":{\"name\":\"Balihoo, Inc.\",\"address\":{\"city\":\"Boise\",\"state\":\"ID\"}}}";
     BlipResponse blipResponse = blip.PutLocation("mybrand", "mylocation", "mysource", locationDocument);
 
-    if (blipResponse.StatusCode == 204)
+    if (blipResponse.STATUS_CODE == 204)
     {
         // location was successfully added/updated
     }
@@ -163,7 +163,7 @@ Delete an individual location.
     Blip blip = new Blip("<Your API Key>", "<Your Secret Key>");
     BlipResponse blipResponse = blip.DeleteLocation("mybrand", "mylocation", "mysource");
 
-    if (blipResponse.StatusCode == 204)
+    if (blipResponse.STATUS_CODE == 204)
     {
         // location was successfully deleted
     }
