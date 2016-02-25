@@ -96,7 +96,7 @@ class BlipRequest {
 
         while ((text = reader.readLine()) != null) {
             builder.append(text);
-            builder.append('\n');
+            builder.append(System.lineSeparator());
         }
 
         String body = builder.toString();

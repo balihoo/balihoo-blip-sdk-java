@@ -1,6 +1,15 @@
 package com.balihoo.sdk;
 
-import java.io.IOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import javax.xml.bind.DatatypeConverter;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * The BLIP object and its methods.
@@ -203,5 +212,94 @@ public class Blip {
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
         return request.ExecuteCommand(BlipRequest.Command.DELETE, path, null);
+    }
+
+    public BlipResponse BulkLoad(String brandKey, String source, String filePath, Boolean implicitDelete,
+                                 int expectedRecordCount, String successEmail, String failEmail,
+                                 String successCallbackUrl, String failCallbackUrl) throws IOException {
+
+        // Use pre-signed auth from BLIP to upload the file to S3
+        BlipResponse s3uplaodResponse = UploadToS3(brandKey, filePath);
+
+        if (s3uplaodResponse.STATUS_CODE == 204) {
+            // Ask BLIP to load the file from S3
+            String s3Path = s3uplaodResponse.BODY;
+            BlipResponse blipLoadResponse = BlipLoad(brandKey, source, s3Path, implicitDelete, expectedRecordCount,
+                    successEmail, failEmail, successCallbackUrl, failCallbackUrl);
+            return blipLoadResponse; // Return BulkLoad response (success or error)
+        } else {
+            return s3uplaodResponse; // Return error response if S3 upload fails.
+        }
+    }
+
+    private BlipResponse UploadToS3(String brandKey, String filePath) throws IOException {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        GZIPOutputStream gzip = new GZIPOutputStream(new BufferedOutputStream(byteStream));
+        FileInputStream in = new FileInputStream(filePath);
+
+        try {
+            byte[] buffer = new byte[1024];
+            int len;
+
+            while ((len = in.read(buffer)) > 0) {
+                gzip.write(buffer, 0, len);
+            }
+        } finally {
+            in.close();
+            gzip.finish();
+            gzip.flush();
+            gzip.close();
+        }
+
+        byte[] compressedFile = byteStream.toByteArray();
+        String fileMD5 = "";
+
+        if (md != null) {
+            md.update(compressedFile);
+            fileMD5 = DatatypeConverter.printHexBinary(md.digest()).toLowerCase();
+        }
+
+        // Get authorization to upload file from BLIP
+        String path = String.format("/brand/%s/authorizeUpload?fileMD5=%s", brandKey, fileMD5);
+        BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
+        BlipResponse authResponse = request.ExecuteCommand(BlipRequest.Command.GET, path, null);
+
+        if (authResponse.STATUS_CODE == 200) {
+            // Upload file to S3
+            String mimeType = Files.probeContentType(Paths.get(filePath));
+            JsonObject auth = new JsonParser().parse(authResponse.BODY).getAsJsonObject();
+            JsonObject formData = auth.get("data").getAsJsonObject();
+            String s3Path = auth.get("url").getAsString();
+            String fileDestination = String.format("%s/%s", s3Path, formData.get("key").getAsString());
+
+            S3Request s3Request = new S3Request();
+            BlipResponse uploadResponse = s3Request.UploadFile(s3Path, formData, mimeType, compressedFile);
+
+            if (uploadResponse.STATUS_CODE == 204) {
+                return new BlipResponse(uploadResponse.STATUS_CODE, fileDestination);
+            } else {
+                return uploadResponse; // Return error response if upload fails.
+            }
+        } else {
+            return authResponse; // Return error response if auth fails.
+        }
+    }
+
+    private BlipResponse BlipLoad(String brandKey, String source, String s3Path, Boolean implicitDelete,
+                                  int expectedRecordCount, String successEmail, String failEmail,
+                                  String successCallbackUrl, String failCallbackUrl) throws IOException {
+        String path = String.format("/brand/%s/bulkLoad?", brandKey);
+        path += String.format(
+            "fileUrl=%s&source=%s&implicitDelete=%s&expectedRecordCount=%s&successEmail=%s&failEmail=%s&successCallback=%s&failCallback=%s",
+            s3Path, source, implicitDelete, expectedRecordCount, successEmail, failEmail, successCallbackUrl, failCallbackUrl
+        );
+        BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
+        return request.ExecuteCommand(BlipRequest.Command.GET, path, null);
     }
 }
