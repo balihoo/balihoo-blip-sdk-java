@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 public class BlipResponseTest {
 
     @Test
-    public void TestBlipResponseSuccessfullyConvertsHttpResponse() {
+    public void testBlipResponseSuccessfullyConvertsHttpResponse() {
         int statusCode = 200;
         String message = "Successful Test";
         BlipResponse blipResponse = new BlipResponse(statusCode, message);

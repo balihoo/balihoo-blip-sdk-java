@@ -38,8 +38,8 @@ class BlipRequest {
      * @return A BlipResponse object.
      * @throws IOException if response cannot be parsed.
      */
-    protected BlipResponse ExecuteCommand(Command command, String path, String content) throws IOException {
-        return buildBlipResponse(ConfigureClient(command, path, content));
+    protected BlipResponse executeCommand(Command command, String path, String content) throws IOException {
+        return buildBlipResponse(configureClient(command, path, content));
     }
 
     /**
@@ -50,7 +50,7 @@ class BlipRequest {
      * @return A configured HttpURLConnection client.
      * @throws IOException if response cannot be parsed.
      */
-    private HttpURLConnection ConfigureClient(Command command, String path, String content) throws IOException {
+    private HttpURLConnection configureClient(Command command, String path, String content) throws IOException {
         URL url = new URL(String.format("%s%s", ENDPOINT, path));
         HttpURLConnection client = (HttpURLConnection) url.openConnection();
 

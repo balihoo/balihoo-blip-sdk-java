@@ -1,15 +1,10 @@
 package com.balihoo.sdk;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import javax.xml.bind.DatatypeConverter;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.commons.validator.routines.UrlValidator;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.zip.GZIPOutputStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The BLIP object and its methods.
@@ -46,10 +41,10 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse Ping() throws IOException {
+    public BlipResponse ping() throws IOException {
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
-        return request.ExecuteCommand(BlipRequest.Command.GET, "/ping", null);
+        return request.executeCommand(BlipRequest.Command.GET, "/ping", null);
     }
 
     /**
@@ -57,10 +52,10 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse GetBrandKeys() throws IOException {
+    public BlipResponse getBrandKeys() throws IOException {
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
-        return request.ExecuteCommand(BlipRequest.Command.GET, "/brand", null);
+        return request.executeCommand(BlipRequest.Command.GET, "/brand", null);
     }
 
     /**
@@ -69,11 +64,11 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse GetBrandSources(String brandKey) throws IOException {
+    public BlipResponse getBrandSources(String brandKey) throws IOException {
         String path = String.format("/brand/%s/source", brandKey);
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
-        return request.ExecuteCommand(BlipRequest.Command.GET, path, null);
+        return request.executeCommand(BlipRequest.Command.GET, path, null);
     }
 
     /**
@@ -82,11 +77,11 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse GetBrandProjections(String brandKey) throws IOException {
+    public BlipResponse getBrandProjections(String brandKey) throws IOException {
         String path = String.format("/brand/%s/projection", brandKey);
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
-        return request.ExecuteCommand(BlipRequest.Command.GET, path, null);
+        return request.executeCommand(BlipRequest.Command.GET, path, null);
     }
 
     /**
@@ -95,8 +90,8 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse GetLocationKeys(String brandKey) throws IOException {
-        return GetLocationKeys(brandKey, "universal");
+    public BlipResponse getLocationKeys(String brandKey) throws IOException {
+        return getLocationKeys(brandKey, "universal");
     }
 
     /**
@@ -106,11 +101,11 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse GetLocationKeys(String brandKey, String projection) throws IOException {
+    public BlipResponse getLocationKeys(String brandKey, String projection) throws IOException {
         String path = String.format("/brand/%s/location?projection=%s", brandKey, projection);
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
-        return request.ExecuteCommand(BlipRequest.Command.GET, path, null);
+        return request.executeCommand(BlipRequest.Command.GET, path, null);
     }
 
     /**
@@ -120,8 +115,8 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse GetLocation(String brandKey, String locationKey) throws IOException {
-        return GetLocation(brandKey, locationKey, "universal", false);
+    public BlipResponse getLocation(String brandKey, String locationKey) throws IOException {
+        return getLocation(brandKey, locationKey, "universal", false);
     }
 
     /**
@@ -132,8 +127,8 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse GetLocation(String brandKey, String locationKey, String projection) throws IOException {
-        return GetLocation(brandKey, locationKey, projection, false);
+    public BlipResponse getLocation(String brandKey, String locationKey, String projection) throws IOException {
+        return getLocation(brandKey, locationKey, projection, false);
     }
 
     /**
@@ -144,8 +139,8 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse GetLocation(String brandKey, String locationKey, Boolean includeRefs) throws IOException {
-        return GetLocation(brandKey, locationKey, "universal", includeRefs);
+    public BlipResponse getLocation(String brandKey, String locationKey, Boolean includeRefs) throws IOException {
+        return getLocation(brandKey, locationKey, "universal", includeRefs);
     }
 
     /**
@@ -157,13 +152,13 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse GetLocation(String brandKey, String locationKey,
+    public BlipResponse getLocation(String brandKey, String locationKey,
                                     String projection, Boolean includeRefs) throws IOException {
         String path = String.format("/brand/%s/location/%s?projection=%s&includeRefs=%s",
                                     brandKey, locationKey, projection, includeRefs.toString().toLowerCase());
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
-        return request.ExecuteCommand(BlipRequest.Command.GET, path, null);
+        return request.executeCommand(BlipRequest.Command.GET, path, null);
     }
 
     /**
@@ -174,12 +169,12 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse QueryLocations(String brandKey, String query, String view) throws IOException {
+    public BlipResponse gueryLocations(String brandKey, String query, String view) throws IOException {
         String path = String.format("/brand/%s/locationList", brandKey);
         String queryParam = String.format("{\"query\":%s,\"view\":\"%s\"}", query, view);
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
-        return request.ExecuteCommand(BlipRequest.Command.POST, path, queryParam);
+        return request.executeCommand(BlipRequest.Command.POST, path, queryParam);
     }
 
     /**
@@ -191,12 +186,12 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse PutLocation(String brandKey, String locationKey,
+    public BlipResponse putLocation(String brandKey, String locationKey,
                                     String source, String locationData) throws IOException {
         String path = String.format("/brand/%s/location/%s?source=%s", brandKey, locationKey, source);
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
-        return request.ExecuteCommand(BlipRequest.Command.PUT, path, locationData);
+        return request.executeCommand(BlipRequest.Command.PUT, path, locationData);
     }
 
     /**
@@ -207,99 +202,103 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse DeleteLocation(String brandKey, String locationKey, String source) throws IOException {
+    public BlipResponse deleteLocation(String brandKey, String locationKey, String source) throws IOException {
         String path = String.format("/brand/%s/location/%s?source=%s", brandKey, locationKey, source);
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
-        return request.ExecuteCommand(BlipRequest.Command.DELETE, path, null);
+        return request.executeCommand(BlipRequest.Command.DELETE, path, null);
     }
 
-    public BlipResponse BulkLoad(String brandKey, String source, String filePath, Boolean implicitDelete,
+    /**
+     * Load a bulk location file into BLIP.
+     * @param brandKey The unique identifier for a single brand.
+     * @param source The unique identifier for the data source being used to add/update the location.
+     * @param filePath The full path to the bulk location file.
+     * @param implicitDelete Whether or not to delete locations from BLIP if they're missing from the file.
+     * @param expectedRecordCount The number of location records to expect in the file.
+     * @param successEmail An optional email address to notify upon success. Can be a comma-delimited list.
+     * @param failEmail An optional email address to notify upon failure. Can be a comma-delimited list.
+     * @param successCallbackUrl An optional URL to call upon success.
+     * @param failCallbackUrl An optional URL to call upon failure.
+     * @return BlipResponse object with a status code and body text if applicable.
+     * @throws IOException if the bulk load cannot be initiated.
+     */
+    public BlipResponse bulkLoad(String brandKey, String source, String filePath, Boolean implicitDelete,
                                  int expectedRecordCount, String successEmail, String failEmail,
                                  String successCallbackUrl, String failCallbackUrl) throws IOException {
-
         // Use pre-signed auth from BLIP to upload the file to S3
-        BlipResponse s3uplaodResponse = UploadToS3(brandKey, filePath);
+        BlipRequest blipRequest = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
+        BlipResponse s3uploadResponse = new S3Request().upload(blipRequest, brandKey, filePath);
 
-        if (s3uplaodResponse.STATUS_CODE == 204) {
-            // Ask BLIP to load the file from S3
-            String s3Path = s3uplaodResponse.BODY;
-            BlipResponse blipLoadResponse = BlipLoad(brandKey, source, s3Path, implicitDelete, expectedRecordCount,
-                    successEmail, failEmail, successCallbackUrl, failCallbackUrl);
-            return blipLoadResponse; // Return BulkLoad response (success or error)
+        if (s3uploadResponse.STATUS_CODE == 204) {
+            String path = String.format("/brand/%s/bulkLoad?", brandKey);
+            path += String.format("s3Path=%s&source=%s&implicitDelete=%s&expectedRecordCount=%s",
+                    s3uploadResponse.BODY, source, implicitDelete, expectedRecordCount);
+
+            // Validate and add optional params
+            if (successEmail != null) {
+                if (isValidEmail(successEmail)) {
+                    path += "&successEmail=" + successEmail;
+                } else {
+                    return new BlipResponse(400, "Error: successEmail is not valid. " + successEmail);
+                }
+            }
+            if (failEmail != null) {
+                if (isValidEmail(failEmail)) {
+                    path += "&failEmail=" + failEmail;
+                } else {
+                    return new BlipResponse(400, "Error: failEmail is not valid. " + failEmail);
+                }
+            }
+            if (successCallbackUrl != null) {
+                if (isValidUrl(successCallbackUrl)) {
+                    path += "&successCallback=" + successCallbackUrl;
+                } else {
+                    return new BlipResponse(400, "Error: successCallback is not valid. " + successCallbackUrl);
+                }
+            }
+            if (failCallbackUrl != null) {
+                if (isValidUrl(failCallbackUrl)) {
+                    path += "&failCallback=" + failCallbackUrl;
+                } else {
+                    return new BlipResponse(400, "Error: failCallback is not valid. " + failCallbackUrl);
+                }
+            }
+
+            // Ask BLIP to load the file from S3 and return its response (success of failure)
+            BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
+            return request.executeCommand(BlipRequest.Command.GET, path, null);
         } else {
-            return s3uplaodResponse; // Return error response if S3 upload fails.
+            return s3uploadResponse; // Return error response if S3 upload fails.
         }
     }
 
-    private BlipResponse UploadToS3(String brandKey, String filePath) throws IOException {
-        MessageDigest md = null;
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        GZIPOutputStream gzip = new GZIPOutputStream(new BufferedOutputStream(byteStream));
-        FileInputStream in = new FileInputStream(filePath);
-
-        try {
-            byte[] buffer = new byte[1024];
-            int len;
-
-            while ((len = in.read(buffer)) > 0) {
-                gzip.write(buffer, 0, len);
+    /**
+     * Validate email address or comma delimited list of email address.
+     * @param email The email address(es) to validate.
+     * @return Boolean validation response.
+     */
+    private Boolean isValidEmail(String email) {
+        if (email != null) {
+            List<String> emailList = Arrays.asList(email.split(","));
+            for (String e : emailList) {
+                Boolean valid = EmailValidator.getInstance().isValid(e);
+                if (!valid) { return false; }
             }
-        } finally {
-            in.close();
-            gzip.finish();
-            gzip.flush();
-            gzip.close();
-        }
-
-        byte[] compressedFile = byteStream.toByteArray();
-        String fileMD5 = "";
-
-        if (md != null) {
-            md.update(compressedFile);
-            fileMD5 = DatatypeConverter.printHexBinary(md.digest()).toLowerCase();
-        }
-
-        // Get authorization to upload file from BLIP
-        String path = String.format("/brand/%s/authorizeUpload?fileMD5=%s", brandKey, fileMD5);
-        BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
-        BlipResponse authResponse = request.ExecuteCommand(BlipRequest.Command.GET, path, null);
-
-        if (authResponse.STATUS_CODE == 200) {
-            // Upload file to S3
-            String mimeType = Files.probeContentType(Paths.get(filePath));
-            JsonObject auth = new JsonParser().parse(authResponse.BODY).getAsJsonObject();
-            JsonObject formData = auth.get("data").getAsJsonObject();
-            String s3Path = auth.get("url").getAsString();
-            String fileDestination = String.format("%s/%s", s3Path, formData.get("key").getAsString());
-
-            S3Request s3Request = new S3Request();
-            BlipResponse uploadResponse = s3Request.UploadFile(s3Path, formData, mimeType, compressedFile);
-
-            if (uploadResponse.STATUS_CODE == 204) {
-                return new BlipResponse(uploadResponse.STATUS_CODE, fileDestination);
-            } else {
-                return uploadResponse; // Return error response if upload fails.
-            }
+            return true; // no invalid emails found
         } else {
-            return authResponse; // Return error response if auth fails.
+            return false; // null email is not valid
         }
     }
 
-    private BlipResponse BlipLoad(String brandKey, String source, String s3Path, Boolean implicitDelete,
-                                  int expectedRecordCount, String successEmail, String failEmail,
-                                  String successCallbackUrl, String failCallbackUrl) throws IOException {
-        String path = String.format("/brand/%s/bulkLoad?", brandKey);
-        path += String.format(
-            "fileUrl=%s&source=%s&implicitDelete=%s&expectedRecordCount=%s&successEmail=%s&failEmail=%s&successCallback=%s&failCallback=%s",
-            s3Path, source, implicitDelete, expectedRecordCount, successEmail, failEmail, successCallbackUrl, failCallbackUrl
-        );
-        BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
-        return request.ExecuteCommand(BlipRequest.Command.GET, path, null);
+    /**
+     * Validate URL
+     * @param url The URL to validate.
+     * @return Boolean validation response.
+     */
+    private Boolean isValidUrl(String url) {
+        String[] schemes = {"http", "https"}; // Exclude ftp which is in the default schemes
+        UrlValidator urlValidator = new UrlValidator(schemes);
+        return urlValidator.isValid(url);
     }
 }
