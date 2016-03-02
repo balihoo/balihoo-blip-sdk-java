@@ -201,6 +201,8 @@ Load a single file containing multiple locations.
 The file for the bulkLoad process should contain each location's data on a single line and each line delimited by a line-feed character (\n). If a location is omitted from the file and implicitDelete is set to true, the location will be deleted.
 
 ##### Example
+```
 {"brandKey":"mybrand","locationKey":"ABC123","document":{...}}\n
 {"brandKey":"mybrand","locationKey":"ABC124","document":{...}}\n
 {"brandKey":"mybrand","locationKey":"ABC125","document":{...}}\n
+```
