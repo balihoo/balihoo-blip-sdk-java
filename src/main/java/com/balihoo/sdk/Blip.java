@@ -212,7 +212,7 @@ public class Blip {
     /**
      * Load a bulk location file into BLIP.
      * @param brandKey The unique identifier for a single brand.
-     * @param source The unique identifier for the data source being used to add/update the location.
+     * @param source The unique identifier for the data source.
      * @param filePath The full path to the bulk location file.
      * @param implicitDelete Whether or not to delete locations from BLIP if they're missing from the file.
      * @param expectedRecordCount The number of location records to expect in the file.
@@ -228,67 +228,63 @@ public class Blip {
                                  String successCallbackUrl, String failCallbackUrl) throws IOException {
         // Use pre-signed auth from BLIP to upload the file to S3
         BlipRequest blipRequest = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
-        BlipResponse s3uploadResponse = new S3Request().upload(blipRequest, brandKey, filePath);
+        BlipResponse s3UploadResponse = new S3Request().upload(blipRequest, brandKey, filePath);
 
-        if (s3uploadResponse.STATUS_CODE == 204) {
-            String path = String.format("/brand/%s/bulkLoad?", brandKey);
-            path += String.format("s3Path=%s&source=%s&implicitDelete=%s&expectedRecordCount=%s",
-                    s3uploadResponse.BODY, source, implicitDelete, expectedRecordCount);
-
-            // Validate and add optional params
-            if (successEmail != null) {
-                if (isValidEmail(successEmail)) {
-                    path += "&successEmail=" + successEmail;
-                } else {
-                    return new BlipResponse(400, "Error: successEmail is not valid. " + successEmail);
-                }
-            }
-            if (failEmail != null) {
-                if (isValidEmail(failEmail)) {
-                    path += "&failEmail=" + failEmail;
-                } else {
-                    return new BlipResponse(400, "Error: failEmail is not valid. " + failEmail);
-                }
-            }
-            if (successCallbackUrl != null) {
-                if (isValidUrl(successCallbackUrl)) {
-                    path += "&successCallback=" + successCallbackUrl;
-                } else {
-                    return new BlipResponse(400, "Error: successCallback is not valid. " + successCallbackUrl);
-                }
-            }
-            if (failCallbackUrl != null) {
-                if (isValidUrl(failCallbackUrl)) {
-                    path += "&failCallback=" + failCallbackUrl;
-                } else {
-                    return new BlipResponse(400, "Error: failCallback is not valid. " + failCallbackUrl);
-                }
-            }
-
-            // Ask BLIP to load the file from S3 and return its response (success of failure)
-            BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
-            return request.executeCommand(BlipRequest.Command.GET, path, null);
-        } else {
-            return s3uploadResponse; // Return error response if S3 upload fails.
+        // Return error response if S3 upload fails.
+        if (s3UploadResponse.STATUS_CODE != 204) {
+            return s3UploadResponse;
         }
+
+        String path = String.format("/brand/%s/bulkLoad?", brandKey);
+        path += String.format("s3Path=%s&source=%s&implicitDelete=%s&expectedRecordCount=%s",
+                s3UploadResponse.BODY, source, implicitDelete, expectedRecordCount);
+
+        // Validate and add optional params
+        if (successEmail != null && !successEmail.isEmpty()) {
+            if (isValidEmail(successEmail)) {
+                path += "&successEmail=" + successEmail;
+            } else {
+                return new BlipResponse(400, "Error: successEmail is not valid. " + successEmail);
+            }
+        }
+        if (failEmail != null && !failEmail.isEmpty()) {
+            if (isValidEmail(failEmail)) {
+                path += "&failEmail=" + failEmail;
+            } else {
+                return new BlipResponse(400, "Error: failEmail is not valid. " + failEmail);
+            }
+        }
+        if (successCallbackUrl != null && !successCallbackUrl.isEmpty()) {
+            if (isValidUrl(successCallbackUrl)) {
+                path += "&successCallback=" + successCallbackUrl;
+            } else {
+                return new BlipResponse(400, "Error: successCallbackUrl is not valid. " + successCallbackUrl);
+            }
+        }
+        if (failCallbackUrl != null && !failCallbackUrl.isEmpty()) {
+            if (isValidUrl(failCallbackUrl)) {
+                path += "&failCallback=" + failCallbackUrl;
+            } else {
+                return new BlipResponse(400, "Error: failCallbackUrl is not valid. " + failCallbackUrl);
+            }
+        }
+
+        // Ask BLIP to load the file from S3 and return its response (success of failure)
+        return blipRequest.executeCommand(BlipRequest.Command.GET, path, null);
     }
 
     /**
-     * Validate email address or comma delimited list of email address.
+     * Validate email address or comma delimited list of email addresses.
      * @param email The email address(es) to validate.
      * @return Boolean validation response.
      */
     private Boolean isValidEmail(String email) {
-        if (email != null) {
-            List<String> emailList = Arrays.asList(email.split(","));
-            for (String e : emailList) {
-                Boolean valid = EmailValidator.getInstance().isValid(e);
-                if (!valid) { return false; }
-            }
-            return true; // no invalid emails found
-        } else {
-            return false; // null email is not valid
+        List<String> emailList = Arrays.asList(email.split(","));
+        for (String e : emailList) {
+            Boolean valid = EmailValidator.getInstance().isValid(e);
+            if (!valid) { return false; }
         }
+        return true; // no invalid emails found
     }
 
     /**

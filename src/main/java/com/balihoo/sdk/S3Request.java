@@ -21,7 +21,7 @@ class S3Request {
 
     /**
      * Upload a bulk location file to S3
-     * @param blipRequest A credentialed BlipRequest object
+     * @param blipRequest A credentialed BlipRequest object.
      * @param brandKey The unique identifier for a single brand.
      * @param filePath The path to the file to be uploaded.
      * @return BlipResponse object with a status code and body text if applicable.
@@ -52,24 +52,25 @@ class S3Request {
         String path = String.format("/brand/%s/authorizeUpload?fileMD5=%s", brandKey, fileMD5);
         BlipResponse authResponse = blipRequest.executeCommand(BlipRequest.Command.GET, path, null);
 
-        if (authResponse.STATUS_CODE == 200) {
-            // Upload file to S3
-            String mimeType = Files.probeContentType(Paths.get(filePath));
-            JsonObject auth = new JsonParser().parse(authResponse.BODY).getAsJsonObject();
-            JsonObject formData = auth.get("data").getAsJsonObject();
-            String s3Bucket = auth.get("s3Bucket").getAsString();
-            String s3Path = String.format("s3://%s/%s", s3Bucket, formData.get("key").getAsString());
-
-            BlipResponse uploadResponse = postFile(s3Bucket, formData, mimeType, content);
-
-            if (uploadResponse.STATUS_CODE == 204) {
-                return new BlipResponse(uploadResponse.STATUS_CODE, s3Path);
-            } else {
-                return uploadResponse; // Return error response if upload fails.
-            }
-        } else {
-            return authResponse; // Return error response if auth fails.
+        // Return error response if auth fails.
+        if (authResponse.STATUS_CODE != 200) {
+            return authResponse;
         }
+
+        // Upload file to S3
+        String mimeType = Files.probeContentType(Paths.get(filePath));
+        JsonObject auth = new JsonParser().parse(authResponse.BODY).getAsJsonObject();
+        JsonObject formData = auth.get("data").getAsJsonObject();
+        String s3Bucket = auth.get("s3Bucket").getAsString();
+        String s3Path = String.format("s3://%s/%s", s3Bucket, formData.get("key").getAsString());
+        BlipResponse uploadResponse = postFile(s3Bucket, formData, mimeType, content);
+
+        // Return error response if upload fails.
+        if (uploadResponse.STATUS_CODE != 204) {
+            return uploadResponse;
+        }
+
+        return new BlipResponse(uploadResponse.STATUS_CODE, s3Path);
     }
 
     /**
@@ -96,16 +97,15 @@ class S3Request {
         builder.addTextBody("AWSAccessKeyId", formData.get("AWSAccessKeyId").getAsString());
         builder.addTextBody("content-type", mimeType);
         builder.addBinaryBody("file", compressedFile); // file has to be the last param added
-
         HttpEntity multipart = builder.build();
         uploadFile.setEntity(multipart);
 
         CloseableHttpResponse response = httpClient.execute(uploadFile);
         int statusCode = response.getStatusLine().getStatusCode();
+        String body = "";
 
         // Get response body if the request is not successful
-        String body = "";
-        if (statusCode < 200 || statusCode > 299) {
+        if (statusCode != 204) {
             HttpEntity responseEntity = response.getEntity();
             body = EntityUtils.toString(responseEntity, "UTF-8");
         }

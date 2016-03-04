@@ -2,6 +2,7 @@
 A Java SDK for interacting with the Balihoo Local Information Platform (BLIP).
 
 ## Requirements
+- This SDK targets Java 7.
 - Using this SDK requires that you already have API keys and are interacting on behalf of a brand that already exists in Balihoo's system. Please contact Balihoo if you require API keys and/or would like to add a new brand to our system.
 
 ## Usage
@@ -175,7 +176,7 @@ Load a single file containing multiple locations.
 #### Parameters
 - brandKey: The unique identifier for a single brand.
 - source: The unique identifier for the data source being used to add/update the location.
-- filePath: The full path to the bulk location file.
+- filePath: The full path to the bulk location file. See note below on the bulk load file format.
 - implicitDelete: Whether or not to delete locations from BLIP if they're missing from the file.
 - expectedRecordCount: The number of location records to expect in the file.
 - successEmail: An optional email address to notify upon success. Can be a comma-delimited list.
@@ -193,14 +194,14 @@ Load a single file containing multiple locations.
     if (blipResponse.STATUS_CODE == 204)
     {
         // File load has been successfully initiated.
-        // Optional success and failure notifications will be made once the load process compeltes.
+        // Optional success and failure notifications will be made once the load process completes.
     }
 ```
 
 #### Bulk Load File Format
 The file for the bulkLoad process should contain each location's data on a single line and each line delimited by a line-feed character (\n). If a location is omitted from the file and implicitDelete is set to true, the location will be deleted.
 
-##### Example
+##### Simplified Example
 ```
 {"brandKey":"mybrand","locationKey":"ABC123","document":{...}}\n
 {"brandKey":"mybrand","locationKey":"ABC124","document":{...}}\n
