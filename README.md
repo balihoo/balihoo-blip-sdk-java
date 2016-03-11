@@ -5,6 +5,11 @@ A Java SDK for interacting with the Balihoo Local Information Platform (BLIP).
 - This SDK targets Java 7.
 - Using this SDK requires that you already have API keys and are interacting on behalf of a brand that already exists in Balihoo's system. Please contact Balihoo if you require API keys and/or would like to add a new brand to our system.
 
+## Installation
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.balihoo.sdk/balihoo-blip-sdk-java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.balihoo.sdk/balihoo-blip-sdk-java)
+
+The SDK is available to install from the Maven central repository.
+
 ## Usage
 ```java
     // Construct a Blip object
