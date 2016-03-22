@@ -169,9 +169,28 @@ public class Blip {
      * @return BlipResponse object with a status code and body text if applicable.
      * @throws IOException if response cannot be parsed.
      */
-    public BlipResponse gueryLocations(String brandKey, String query, String view) throws IOException {
+    public BlipResponse queryLocations(String brandKey, String query, String view) throws IOException {
+        return queryLocations(brandKey, query, view, null, null);
+    }
+
+    /**
+     * Get data for locations in a single brand that match the specified BLIP query.
+     * @param brandKey The unique identifier for a single brand.
+     * @param query A stringified JSON query used to filter locations in BLIP.
+     * @param view The name of the view to return if known.
+     * @param pageSize The number of results to include in each page of results.
+     * @param pageNumber The page index to return.
+     * @return BlipResponse object with a status code and body text if applicable.
+     * @throws IOException if response cannot be parsed.
+     */
+    public BlipResponse queryLocations(String brandKey, String query, String view,
+                                       Integer pageSize, Integer pageNumber) throws IOException {
         String path = String.format("/brand/%s/locationList", brandKey);
-        String queryParam = String.format("{\"query\":%s,\"view\":\"%s\"}", query, view);
+        String queryParam = String.format("{\"query\":%s,\"view\":\"%s\"", query, view);
+        if (pageSize != null && pageNumber != null) {
+            queryParam += String.format(",\"pageSize\":%s,\"pageNumber\":%s", pageSize, pageNumber);
+        }
+        queryParam += "}";
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
         return request.executeCommand(BlipRequest.Command.POST, path, queryParam);
