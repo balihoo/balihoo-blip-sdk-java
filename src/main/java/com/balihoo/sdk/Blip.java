@@ -170,11 +170,7 @@ public class Blip {
      * @throws IOException if response cannot be parsed.
      */
     public BlipResponse queryLocations(String brandKey, String query, String view) throws IOException {
-        String path = String.format("/brand/%s/locationList", brandKey);
-        String queryParam = String.format("{\"query\":%s,\"view\":\"%s\"}", query, view);
-        BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
-
-        return request.executeCommand(BlipRequest.Command.POST, path, queryParam);
+        return queryLocations(brandKey, query, view, null, null);
     }
 
     /**
@@ -190,8 +186,11 @@ public class Blip {
     public BlipResponse queryLocations(String brandKey, String query, String view,
                                        Integer pageSize, Integer pageNumber) throws IOException {
         String path = String.format("/brand/%s/locationList", brandKey);
-        String queryParam = String.format("{\"query\":%s,\"view\":\"%s\",\"pageSize\":%s,\"pageNumber\":%s}",
-                query, view, pageSize, pageNumber);
+        String queryParam = String.format("{\"query\":%s,\"view\":\"%s\"", query, view);
+        if (pageSize != null && pageNumber != null) {
+            queryParam += String.format(",\"pageSize\":%s,\"pageNumber\":%s", pageSize, pageNumber);
+        }
+        queryParam += "}";
         BlipRequest request = new BlipRequest(API_KEY, SECRET_KEY, ENDPOINT);
 
         return request.executeCommand(BlipRequest.Command.POST, path, queryParam);
