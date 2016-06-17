@@ -158,7 +158,7 @@ Add a new location or update an existing location's data.
 #### Example
 ```java
     Blip blip = new Blip("<Your API Key>", "<Your Secret Key>");
-    String locationDocument = "{\"document\":{\"name\":\"Balihoo, Inc.\",\"address\":{\"city\":\"Boise\",\"state\":\"ID\"}}}";
+    String locationDocument = "{\"name\":\"Balihoo, Inc.\",\"address\":{\"city\":\"Boise\",\"state\":\"ID\"}}";
     BlipResponse blipResponse = blip.putLocation("mybrand", "mylocation", "mysource", locationDocument);
 
     if (blipResponse.STATUS_CODE == 204)
