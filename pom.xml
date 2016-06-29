@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.balihoo.sdk</groupId>
     <artifactId>balihoo-blip-sdk-java</artifactId>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
 
     <name>balihoo-blip-sdk-java</name>
     <description>A Java SDK for BLIP by Balihoo</description>
